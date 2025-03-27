@@ -71,6 +71,39 @@
             text-decoration: line-through;
             color: #666;
         }
+        .todo-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-left: auto;
+        }
+        
+        .edit-btn {
+            background-color: #2196F3;
+        }
+        
+        .delete-btn {
+            background-color: #f44336;
+        }
+
+        .todo-item {
+            justify-content: space-between;
+            padding: 1rem;
+        }
+
+        .todo-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .edit-input {
+            display: none;
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -83,8 +116,15 @@
             </div>
             <ul id="todoList" class="todo-list">
                 <li class="todo-item">
-                    <input type="checkbox" onchange="toggleTodo(this)">
-                    <span>첫 번째 할 일</span>
+                    <div class="todo-content">
+                        <input type="checkbox" onchange="toggleTodo(this)">
+                        <span>첫 번째 할 일</span>
+                        <input type="text" class="edit-input">
+                    </div>
+                    <div class="todo-buttons">
+                        <button class="edit-btn" onclick="editTodo(this)">수정</button>
+                        <button class="delete-btn" onclick="deleteTodo(this)">삭제</button>
+                    </div>
                 </li>
             </ul>
         </div>
@@ -99,15 +139,40 @@
                 const li = document.createElement('li');
                 li.className = 'todo-item';
                 
+                const todoContent = document.createElement('div');
+                todoContent.className = 'todo-content';
+
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.onchange = function() { toggleTodo(this); };
                 
                 const span = document.createElement('span');
                 span.textContent = input.value;
+
+                const editInput = document.createElement('input');
+                editInput.type = 'text';
+                editInput.className = 'edit-input';
                 
-                li.appendChild(checkbox);
-                li.appendChild(span);
+                const buttons = document.createElement('div');
+                buttons.className = 'todo-buttons';
+                
+                const editBtn = document.createElement('button');
+                editBtn.textContent = '수정';
+                editBtn.className = 'edit-btn';
+                editBtn.onclick = function() { editTodo(this); };
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = '삭제';
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.onclick = function() { deleteTodo(this); };
+                
+                todoContent.appendChild(checkbox);
+                todoContent.appendChild(span);
+                todoContent.appendChild(editInput);
+                buttons.appendChild(editBtn);
+                buttons.appendChild(deleteBtn);
+                li.appendChild(todoContent);
+                li.appendChild(buttons);
                 todoList.appendChild(li);
                 
                 input.value = '';
@@ -121,6 +186,33 @@
             } else {
                 span.classList.remove('completed');
             }
+        }
+
+        function editTodo(button) {
+            const todoItem = button.closest('.todo-item');
+            const span = todoItem.querySelector('span');
+            const editInput = todoItem.querySelector('.edit-input');
+            
+            if (button.textContent === '수정') {
+                // 수정 모드 시작
+                editInput.value = span.textContent;
+                editInput.style.display = 'block';
+                span.style.display = 'none';
+                button.textContent = '저장';
+            } else {
+                // 수정 내용 저장
+                if (editInput.value.trim() !== '') {
+                    span.textContent = editInput.value;
+                }
+                editInput.style.display = 'none';
+                span.style.display = 'inline';
+                button.textContent = '수정';
+            }
+        }
+
+        function deleteTodo(button) {
+            const todoItem = button.closest('.todo-item');
+            todoItem.remove();
         }
     </script>
 </body>
